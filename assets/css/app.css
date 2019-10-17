@@ -1,0 +1,58 @@
+body{
+  background-color: #14bdac;
+}
+
+.button{
+  background-color: #0da192;
+  border: none;
+  color: #ffffff;
+  height: 100px;
+  width: 100px;
+  float: top-left;
+  text-align: centre;
+  font-size: 100px;
+  outline: none;
+}
+
+.button:hover {
+  background-color: #12dac6;
+  cursor: pointer;
+}
+
+.grid-container{
+  width: 321px;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-gap: 7px;
+}
+
+.turn{
+  color: white;
+  font-family: 'Quicksand', sans-serif;
+  float: top;
+}
+
+#turn{
+  font-size: 45px;
+  float: top;
+}
+
+.refresh{
+  font-size: 45px;
+  float: right;
+  background-color: #14bdac;
+  color: #0c7a6f;
+  border: none;
+  outline: none;
+}
+
+.refresh:hover{
+  cursor: pointer;
+}
+
+#game {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
