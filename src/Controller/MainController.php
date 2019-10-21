@@ -61,7 +61,7 @@ class MainController extends AbstractController
         //Paduodamos reiksmes validacija ar string ilgis yra 2, bei ar pirmasis stringo elementas yra X bet antrasis skaicius
         if(strlen($cell) == 2 && (str_split($cell)[0] === 'X' && is_numeric(str_split($cell)[1]) ) ) {
             $cell = "set" . $cell;
-            $game->$cell('user');
+            $game->$cell('User');
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->flush();
         }
