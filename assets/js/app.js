@@ -1,14 +1,24 @@
-/*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
+const $ = require('jquery');
 
-// any CSS you require will output into a single css file (app.css in this case)
 require('../css/app.css');
 
-// Need jQuery? Install it with "yarn add jquery", then uncomment to require it.
-// const $ = require('jquery');
+$(document).ready(function(){
+    var movesCounter = 1;
 
-console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
+    $('.button').click(function() {
+        if (movesCounter < 10) {
+            if (movesCounter % 2 === 0) {
+                $(this).html('<i class="fas fa-times"></i>');
+            } else {
+                $(this).html('<i class="far fa-circle"></i>');
+            }
+            movesCounter++;
+        }
+    });
+
+    $('.button').click(function (e) {
+        e.preventDefault();
+
+        fetch("/make-move/"+$(this).attr('data-id')+"/"+$(this).attr('id'));
+    })
+});

@@ -3,7 +3,7 @@ body{
 }
 
 .button{
-  background-color: #0da192;
+  background-color: #f56700;
   border: none;
   color: #ffffff;
   height: 100px;
@@ -12,6 +12,14 @@ body{
   text-align: centre;
   font-size: 100px;
   outline: none;
+  position: relative;
+}
+
+.fas, .far {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .button:hover {
