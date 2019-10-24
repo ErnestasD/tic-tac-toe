@@ -6,7 +6,7 @@ use App\Repository\GameRepository;
 use App\Entity\Game;
 use Doctrine\ORM\EntityManagerInterface;
 
-class WinnerChecker 
+class WinnerCheckerService 
 {
     /**
      * @var GameRepository
@@ -32,6 +32,8 @@ class WinnerChecker
         $x8 = $game->getX8();
         $x9 = $game->getX9();
 
+        // Visos imanomos linijos norint laimeti zaidima.
+        // Jeigu linijos masyvo visos reiksmes vienodos, zaidimas yra baigtas ir laimetojas yra betkuri tos linijos reiksme
         $winningLines = [
             [$x1, $x2, $x3],
             [$x4, $x5, $x6],
@@ -43,18 +45,22 @@ class WinnerChecker
             [$x3, $x5, $x7]
         ];
 
+        $drawLines = [];
+
+        // Po kiekvieno ejimo tikrinamos liniju reiksmes t.y. ar nera liniju su visom vienodom vertem jeigu ne 
+        // ta linija pridedama prie "Lygiuju" masyvo
         foreach ($winningLines as $line) {
             if (count(array_unique($line)) === 1) {
-                return $this->addFlash(
-                    'success',
-                    "Congratulations winner is: " . $line[0]
-                );
-            } elseif (array_search(null, $line) !== false && count(array_unique($line)) !== 1) {
-                return $this->addFlash(
-                    'success',
-                    "It's draw!"
-                );
+                return $line[0];
+            } elseif (array_search(null, $line) == false && count(array_unique($line)) !== 1) {
+                $line = false;
+                array_push($drawLines, $line);
             }
+        }
+
+        // Jeigu visos "Lygiuju" masyvo reiksmes yra vienodos t.y. nei viena is liniju neturi 3-ju vienodu reiksmiu, service'as grazina lygiasas 
+        if (count(array_unique($drawLines)) === 1 && count($drawLines) === 8) {
+            return "Draw";
         }
     }
 }

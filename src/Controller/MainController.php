@@ -3,12 +3,24 @@
 namespace App\Controller;
 
 use App\Entity\Game;
+use App\Service\WinnerCheckerService;
+use App\Service\CPUMoveService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MainController extends AbstractController
 {
+    private $winnerCheckerService;
+
+    private $cpuMoveService;
+
+    public function __construct(WinnerCheckerService $winnerCheckerService, CPUMoveService $cpuMoveService)
+    {
+        $this->winnerCheckerService = $winnerCheckerService;
+        $this->cpuMoveService = $cpuMoveService;
+    }
+
     /**
      * @Route("/")
      */
@@ -30,10 +42,9 @@ class MainController extends AbstractController
         $entityManager->persist($game);
         $entityManager->flush();
 
-        return $this->redirectToRoute(
-            'game_page',
-            ['id' => $game->getId()]
-        );
+        return $this->redirectToRoute('game_page', [
+            'id' => $game->getId()
+        ]);
     }
 
     /**
@@ -43,12 +54,9 @@ class MainController extends AbstractController
     {
         $game = $this->getDoctrine()->getRepository(Game::class)->find($id);
 
-        return $this->render(
-            'game.html.twig', 
-            [
-                'game' => $game
-            ]
-        );
+        return $this->render('game.html.twig', [
+            'game' => $game
+        ]);
     }
 
     /**
@@ -61,11 +69,19 @@ class MainController extends AbstractController
         //Paduodamos reiksmes validacija ar string ilgis yra 2, bei ar pirmasis stringo elementas yra X bet antrasis skaicius
         if(strlen($cell) == 2 && (str_split($cell)[0] === 'X' && is_numeric(str_split($cell)[1]) ) ) {
             $cell = "set" . $cell;
-            $game->$cell('User');
+            $game->$cell('user');
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->flush();
-        }
-        
-        return new JsonResponse('OK');
+            $serviceResponse = $this->winnerCheckerService->checkForWinner($id);
+            $this->cpuMoveService->cpuMakeMove($id);
+
+            if ($serviceResponse !== null && $serviceResponse === "Draw") {
+                return new JsonResponse('Draw');
+            } elseif ($serviceResponse !== null) {
+                return new JsonResponse($serviceResponse);
+            }
+
+            return new JsonResponse('OK');
+        }        
     }
 }
