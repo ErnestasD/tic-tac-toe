@@ -52,7 +52,7 @@ class WinnerCheckerService
         foreach ($winningLines as $line) {
             if (count(array_unique($line)) === 1) {
                 return $line[0];
-            } elseif (array_search(null, $line) == false && count(array_unique($line)) !== 1) {
+            } elseif (array_search(null, $line) === false && count(array_unique($line)) !== 1) {
                 $line = false;
                 array_push($drawLines, $line);
             }

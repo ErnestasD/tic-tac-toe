@@ -52,6 +52,7 @@ class CPUMoveService
             "X9" => $x9
         ];
 
+        // visos imanomos zaidimo linijos
         $lines = [
             ['X1' => $x1, 'X2' => $x2, 'X3' => $x3],
             ['X4' => $x4, 'X5' => $x5, 'X6' => $x6],
@@ -75,27 +76,17 @@ class CPUMoveService
 
         if ($movesCounter === 1) {
             $data = $this->firstMove($game);
-        } 
-        else {
-            foreach ($lines as $line) {
-                $cpuCounter = 0;
-                $nullCounter = 0;
-
-                foreach ($line as $key => $val) {
-                    if ($val == 'CPU') {
-                        $cpuCounter++;
-                    } elseif ($val == null) {
-                        $nullCounter++;
-                    }
-                }
-                if ($cpuCounter == 2 && $nullCounter == 1) {
-                    $nullIndex = array_search(null, $line);
-                    $action = 'set' . $nullIndex;
-                    $game->$action('CPU');
-
-                    $data['key'] = $nullIndex;
-                    break;
-                }
+        } else {
+            // Pagal prioriteta CPU pirmoje vietoje tikrina ar nera linijos masyvo, kuriame butu 2 CPU reiksmes
+            // tai yra, jeigu CPU likusioje laisvoje tos linijos vietoje padarys savo ejima - laimes
+            $data = $this->tryWinMove($lines, $game);
+            if ($data == false) {
+                // Jeigu nera ejimo, po kurio laimetu CPU, tikrinama ar nera liniju kuriu dvi reiksmes yra 'user' t.y. jeigu CPU neatliks ejimo toje linijoje - pralaimes
+                $data = $this->tryBlockUser($lines, $game);
+            } 
+            if ($data == null) {
+                // Jeigu nera case'o, kad kompiuteris laimetu arba blokuotu zaidejo lemiama ejima, atliekamas atsitiktinis ejimas
+                $data = $this->randomMove($game, $board);
             }
         }
 
@@ -163,5 +154,63 @@ class CPUMoveService
             'game' => $game,
             'key' => $randomKey
         ];
+    }
+
+    // ejimo cpu pergalei pasiekti funkcija
+    function tryWinMove($lines, $game) {
+        foreach ($lines as $line) {
+            $cpuCounter = 0;
+            $nullCounter = 0;
+            foreach ($line as $key => $val) {
+                if ($val == 'CPU') {
+                    $cpuCounter++;
+                } elseif ($val == null) {
+                    $nullCounter++;
+                }
+            }
+            // tikrinama ar nera liniju masyvo, kurio 2 reiksmes butu 'CPU', tai reiskia kad truksta vieno ejimo CPU pergalei
+            if ($cpuCounter == 2 && $nullCounter == 1) {
+                $nullIndex = array_search(null, $line);
+                $action = 'set' . $nullIndex;
+                $game->$action('CPU');
+
+                $data = [
+                    'game' => $game,
+                    'key' => $nullIndex
+                ];
+                return $data;
+            }
+        }
+
+        return false;
+    }
+
+    // funkcija neleidzianti zaidejui laimeti
+    function tryBlockUser($lines, $game) {
+        foreach ($lines as $line) {
+            $userCounter = 0;
+            $nullCounter = 0;
+            foreach ($line as $key => $val) {
+                if ($val == 'user') {
+                    $userCounter++;
+                } elseif ($val == null) {
+                    $nullCounter++;
+                }
+            }
+            // Tikrinama ar nera liniju masyvo, kurio 2 reiksmes butu 'user', tai yra CPU butinai turi blokuoti ta linija, kad nepralaimetu
+            if ($userCounter == 2 && $nullCounter == 1) {
+                $nullIndex = array_search(null, $line);
+                $action = 'set' . $nullIndex;
+                $game->$action('CPU');
+
+                $data = [
+                    'game' => $game,
+                    'key' => $nullIndex
+                ];
+                return $data;
+            }
+        }
+
+        return null;
     }
 }

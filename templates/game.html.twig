@@ -1,6 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <div class="container d-flex flex-column justify-content-center align-items-center w-25">
+        <p id="tic-tac-toe" class="mt-2">TIC-TAC-TOE</p>
+        <p id="player-move" class="mt-5 turn-info">Player turn</p>
+        <p id="cpu-move" class="mt-5 turn-info d-none">Computer is thinking...</p>
+    </div>
     <div id="game">
         <div class="grid-container">
             <button id="X1" data-id="{{ game.id }}" class="button" type="button"></button>
@@ -14,6 +19,7 @@
             <button id="X9" data-id="{{ game.id }}" class="button" type="button"></button>
         </div>
     </div>
+    <div id="currentGameId" class="d-none" data-id="{{ game.id }}"></div>
     <div class="modal" tabindex="-1" role="dialog" id="myModal">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -21,7 +27,7 @@
                 <p id="gameResult"></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="{{ path('start_new_game') }}" class="btn btn-success mt-5">Restart!</a>
             </div>
             </div>
         </div>

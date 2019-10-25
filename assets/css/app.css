@@ -64,3 +64,11 @@ body{
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.turn-info {
+  font-size: 26px;
+}
+
+#tic-tac-toe {
+  font-size: 40px;
+}
